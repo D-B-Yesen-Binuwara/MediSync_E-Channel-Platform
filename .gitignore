@@ -1,1 +1,26 @@
+# Node / React
+node_modules/
+build/
+.env
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
+# ASP.NET / Visual Studio
+bin/
+obj/
+*.user
+*.suo
+*.vs/
+*.vscode/
+*.pdb
+*.cache
+*.log
+
+# MySQL / Database
+*.sql
+*.bak
+
+# OS Files
+.DS_Store
+Thumbs.db
