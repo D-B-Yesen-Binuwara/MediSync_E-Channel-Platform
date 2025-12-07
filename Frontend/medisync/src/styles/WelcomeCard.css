@@ -1,0 +1,17 @@
+.welcome-card {
+  background: linear-gradient(135deg, #1976D2 0%, #0D47A1 100%);
+  border-radius: 12px;
+  color: #fff;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.welcome-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.welcome-subtitle {
+  color: #dbeafe;
+}

@@ -1,0 +1,73 @@
+# Database Schema Relationships & User Scenarios
+
+## Relationships
+
+1. **Users ↔ Appointments**
+   - One-to-many: A user (patient) can have zero or more appointments.
+   - `Appointments.patient_id` is a foreign key referencing `Users.user_id`.
+
+2. **Doctors ↔ Doctor_Schedules**
+   - One-to-many: A doctor can have multiple schedules.
+   - `Doctor_Schedules.doctor_id` is a foreign key referencing `Doctors.doctor_id`.
+
+3. **Doctor_Schedules ↔ Appointments**
+   - One-to-many: Each schedule can have multiple appointments (up to total_slots).
+   - `Appointments.schedule_id` is a foreign key referencing `Doctor_Schedules.schedule_id`.
+
+4. **Users ↔ Favorites**
+   - One-to-many: A user (patient) can favorite multiple doctors.
+   - `Favorites.patient_id` is a foreign key referencing `Users.user_id`.
+   - `Favorites.doctor_id` is a foreign key referencing `Doctors.doctor_id`.
+
+5. **Appointments ↔ Transactions**
+   - One-to-one: Each appointment can have one transaction (payment record).
+   - `Transactions.appointment_id` is a foreign key referencing `Appointments.appointment_id`.
+   - `Transactions.patient_id` is a foreign key referencing `Users.user_id`.
+
+---
+
+## User Scenarios & Field Updates
+
+### 1. **User Registration**
+- **Action:** Patient or admin registers.
+- **Fields Updated:**
+  - `Users`: New row added. `created_at` set to current timestamp.
+
+### 2. **Doctor Adds Schedule**
+- **Action:** Doctor creates a new schedule.
+- **Fields Updated:**
+  - `Doctor_Schedules`: New row added. `created_at` set to current timestamp.
+
+### 3. **Patient Books Appointment**
+- **Action:** Patient selects a schedule and books an appointment.
+- **Fields Updated:**
+  - `Appointments`: New row added. `status` set to 'booked'. `created_at` set to current timestamp.
+  - `Doctor_Schedules.total_slots`: Decremented by 1 (if implemented in logic).
+
+### 4. **Patient Cancels/Reschedules Appointment**
+- **Action:** Patient cancels or reschedules.
+- **Fields Updated:**
+  - `Appointments.status`: Updated to 'cancelled' or 'rescheduled'. `updated_at` set to current timestamp.
+
+### 5. **Patient Adds Favorite Doctor**
+- **Action:** Patient marks a doctor as favorite.
+- **Fields Updated:**
+  - `Favorites`: New row added. `created_at` set to current timestamp.
+
+### 6. **Patient Makes Payment**
+- **Action:** Patient pays for an appointment.
+- **Fields Updated:**
+  - `Transactions`: New row added. `status` set to 'completed'. `payment_date` set to current timestamp.
+
+### 7. **Admin Views Reports**
+- **Action:** Admin queries appointments, transactions, etc.
+- **Fields Updated:**
+  - No direct updates; only SELECT queries.
+
+---
+
+## Notes
+- If a patient has no appointments, their `Appointments` collection is null or empty.
+- If a patient has no favorites, their `Favorites` collection is null or empty.
+- If an appointment has no payment, its `Transaction` is null.
+- All timestamps (`created_at`, `updated_at`, `payment_date`) are set automatically on insert/update.

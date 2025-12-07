@@ -1,0 +1,69 @@
+SPRINT-01 - BA - Yesen Binuwara
+
+EPIC 01 - USER & ACCOUNT MANAGEMENT
+
+Goal: Allow patients to register, log in, reset password and manage their profiles.
+
+User Story 1.1 - As a patient, I want to register with my personal details so that I can access the system.
+
+Acceptance Criteria:
+E01.S01.A01.01: Registration requires name, email, NIC, password.
+E01.S01.A01.02: Validation prevents duplicate emails.
+E01.S01.A01.03: Success shows confirmation message.
+
+------------------------------
+
+User Story 1.2: As a patient, I want to log in securely so that I can access my appointments and history.
+
+Acceptance Criteria:
+E01.S01.A02.01: Login requires valid email + password.
+E01.S01.A02.02: Incorrect login shows error message.
+E01.S01.A02.03: Session management works until logout.
+
+User story 1.3: As a patient i want have a forget password option so that i can reset my password
+
+Acceptance Criteria:
+E01.S01.A03.01: forget password requires a valid email
+E01.S01.A03.02: invalid emails should be detected
+E01.S01.A03.03: a email should be sent to the given valid email
+
+------------------------------
+
+User Story 1.4: As a patient, I want to update my profile so I can keep my information accurate.
+
+Acceptance Criteria:
+E01.S01.A04.01: Editable fields: phone, address, password.
+E01.S01.A04.02: Changes saved in DB.
+E01.S01.A04.03: Confirmation message shown.
+
+-------------################################--------
+
+EPIC 02 - 
+Goal: Enable patients to find doctors quickly.
+
+User Story 2.1 -As a patient, I want to search doctors by specialization or name so I can find the right doctor
+E02.S02.A01.01: Acceptance Criteria: Search bar returns doctors matching specialization.
+
+
+User Story 2.2 - As a patient, I want to filter doctors by date & availability so I can book when I am free.
+E02.S02.A02.01: Acceptance Criteria: Only available slots are displayed.
+
+User Story 2.3 - As a patient, I want to view doctor details so I can choose the right consultation.
+E02.S02.A03.01: Acceptance Criteria: Profile shows name, specialization, availability.
+
+--------------------------
+
+ACCEPTANCE CRITERIAS MET
+E01.S01.A01.01
+E01.S01.A01.02
+E01.S01.A01.03
+
+E01.S01.A02.01
+E01.S01.A02.02
+E01.S01.A02.03
+
+E02.S02.A01.01
+E02.S02.A03.01
+
+TO-BE-MET
+E02.S02.A02.01

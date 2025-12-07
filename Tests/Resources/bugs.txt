@@ -1,0 +1,256 @@
+# MediSync User Profile Management - Bug Report & Issues
+
+## 🔴 CRITICAL ISSUES
+
+### 1. Password Hashing Inconsistency
+**Location**: AuthService.cs vs Database
+**Description**: Database contains BCrypt hash ($2a$11$pRSX02Rh02O1HLsTyfs0vOq7FnL1ZnJuiBluK8b8JD5MyWFQxu4yy) but AuthService uses PBKDF2
+**Impact**: 
+- Existing users cannot login with their passwords
+- Authentication system completely broken for existing users
+- Data migration required
+**Priority**: CRITICAL
+**Test Evidence**: Integration tests show password verification fails
+**Recommended Fix**: 
+```csharp
+// Option 1: Add BCrypt support
+public bool VerifyPassword(string password, string hash)
+{
+    if (hash.StartsWith("$2a$") || hash.StartsWith("$2b$"))
+        return BCrypt.Net.BCrypt.Verify(password, hash);
+    
+    // Existing PBKDF2 logic
+    return VerifyPbkdf2Password(password, hash);
+}
+
+// Option 2: Migrate all existing hashes to PBKDF2
+```
+
+### 2. AuthService Constructor Dependency
+**Location**: UserService.cs line 15
+**Description**: AuthService requires IHttpClientFactory but tests pass null
+**Impact**: 
+- Runtime null reference exceptions possible
+- Tests don't reflect real behavior
+- Dependency injection issues
+**Priority**: CRITICAL
+**Test Evidence**: Mock setup passes null for IHttpClientFactory
+**Recommended Fix**: Make IHttpClientFactory optional or provide proper mock
+
+## 🟡 HIGH PRIORITY ISSUES
+
+### 3. Image Size Validation Timing
+**Location**: UserService.UpdateProfileAsync line 45-50
+**Description**: Image size validation happens after base64 conversion
+**Impact**: 
+- Memory spike before validation
+- Potential DoS with large images
+- Poor user experience
+**Priority**: HIGH
+**Test Evidence**: Integration tests show memory allocation before validation
+**Recommended Fix**:
+```csharp
+// Validate base64 string length before conversion
+var estimatedSize = (base64Data.Length * 3) / 4;
+if (estimatedSize > 1024 * 1024)
+    throw new ArgumentException("Image size exceeds 1MB limit.");
+```
+
+### 4. Transaction Repository Coupling
+**Location**: UserService constructor
+**Description**: UserService depends on ITransactionRepository for only one method
+**Impact**: 
+- Unnecessary coupling
+- Harder to test and maintain
+- Violates single responsibility
+**Priority**: HIGH
+**Recommended Fix**: Move GetTransactionsAsync to separate TransactionService
+
+### 5. Missing Repository Interface Methods
+**Location**: IUserRepository.cs
+**Description**: Missing GetByEmailAsync method used in authentication
+**Impact**: 
+- Inconsistent data access patterns
+- Potential performance issues
+- Code duplication
+**Priority**: HIGH
+**Test Evidence**: AuthService directly queries context instead of using repository
+
+## 🟠 MEDIUM PRIORITY ISSUES
+
+### 6. Inconsistent Error Logging
+**Location**: UserController.ChangePassword lines 67-69
+**Description**: Uses Console.WriteLine instead of proper logging
+**Impact**: 
+- Poor production debugging
+- No log levels or structured logging
+- Hard to monitor in production
+**Priority**: MEDIUM
+**Test Evidence**: Console output in test runs
+**Recommended Fix**: Inject ILogger<UserController>
+
+### 7. Magic Numbers and Hard-coded Values
+**Location**: Multiple locations
+**Description**: Hard-coded values like 1MB limit, 6 character password minimum
+**Impact**: 
+- Hard to maintain and configure
+- Not environment-specific
+- Poor flexibility
+**Priority**: MEDIUM
+**Locations**:
+- UserService.cs line 49: `1024 * 1024`
+- UserService.cs line 78: `6`
+**Recommended Fix**: Move to appsettings.json configuration
+
+### 8. Null Reference Potential
+**Location**: UserService.GetTransactionsAsync lines 108-112
+**Description**: Multiple null-conditional operators suggest fragile null handling
+**Impact**: 
+- Potential runtime exceptions
+- Inconsistent data display
+- Poor user experience
+**Priority**: MEDIUM
+**Test Evidence**: Integration tests show null handling issues
+**Recommended Fix**: Add proper null checks and default values
+
+### 9. Profile Image Storage Strategy
+**Location**: User.cs ProfileImage property
+**Description**: Images stored as byte[] in database
+**Impact**: 
+- Database bloat with large images
+- Poor query performance
+- Backup/restore issues
+**Priority**: MEDIUM
+**Recommended Fix**: Store images in blob storage, keep references in DB
+
+## 🟢 LOW PRIORITY ISSUES
+
+### 10. Missing Input Sanitization
+**Location**: UpdateProfileDto properties
+**Description**: No HTML encoding or input sanitization
+**Impact**: 
+- Potential XSS if data displayed without encoding
+- Data integrity issues
+**Priority**: LOW
+**Recommended Fix**: Add validation attributes and sanitization
+
+### 11. Hardcoded Error Messages
+**Location**: Multiple service methods
+**Description**: Error messages hardcoded in business logic
+**Impact**: 
+- Difficult to localize
+- Inconsistent messaging
+- Hard to maintain
+**Priority**: LOW
+**Recommended Fix**: Move to resource files
+
+### 12. Missing Audit Trail
+**Location**: User entity
+**Description**: No created/modified timestamps or user tracking
+**Impact**: 
+- No audit capability
+- Compliance issues
+- Debugging difficulties
+**Priority**: LOW
+**Recommended Fix**: Add audit fields (CreatedAt, UpdatedAt, CreatedBy, UpdatedBy)
+
+## 🔒 SECURITY CONCERNS
+
+### 13. Password Reset Token Storage
+**Location**: User.cs PasswordResetToken
+**Description**: Password reset tokens stored in plain text
+**Impact**: 
+- Security risk if database compromised
+- Token replay attacks possible
+**Priority**: HIGH
+**Recommended Fix**: Hash password reset tokens
+
+### 14. Missing Rate Limiting
+**Location**: UserController endpoints
+**Description**: No rate limiting on sensitive operations
+**Impact**: 
+- Brute force attacks possible
+- DoS vulnerability
+**Priority**: MEDIUM
+**Recommended Fix**: Add rate limiting middleware
+
+### 15. Insufficient Input Validation
+**Location**: DTOs
+**Description**: Missing comprehensive input validation
+**Impact**: 
+- Injection attacks possible
+- Data integrity issues
+**Priority**: MEDIUM
+**Recommended Fix**: Add comprehensive validation attributes
+
+## ⚡ PERFORMANCE ISSUES
+
+### 16. N+1 Query Potential
+**Location**: UserRepository.GetByIdAsync
+**Description**: Includes multiple related entities unnecessarily
+**Impact**: 
+- Slow queries with large datasets
+- Excessive database load
+**Priority**: MEDIUM
+**Test Evidence**: Integration tests show multiple includes
+**Recommended Fix**: Use projection for specific use cases
+
+### 17. Base64 Conversion Overhead
+**Location**: UserService profile methods
+**Description**: Base64 conversion on every profile request
+**Impact**: 
+- CPU overhead
+- Memory allocation
+**Priority**: LOW
+**Recommended Fix**: Cache converted images or use lazy loading
+
+## TEST COVERAGE GAPS
+
+### Missing Test Scenarios
+1. **Concurrent Operations**: Multiple users updating profiles simultaneously
+2. **Large Data Sets**: Performance with thousands of users
+3. **Network Failures**: Database connection issues
+4. **Memory Limits**: Large image upload scenarios
+5. **Security Testing**: SQL injection, XSS attempts
+6. **Load Testing**: 100+ concurrent users
+7. **Edge Cases**: Malformed JWT tokens, expired sessions
+
+### Recommended Additional Tests
+1. **Performance Tests**: Response time under load
+2. **Security Tests**: Penetration testing
+3. **Integration Tests**: Full API endpoint testing
+4. **Stress Tests**: Memory and CPU usage
+5. **Compatibility Tests**: Different browsers/devices
+
+## PRIORITY MATRIX
+
+| Issue | Priority | Impact | Effort | Timeline |
+|-------|----------|--------|--------|----------|
+| Password Hashing | Critical | High | Medium | Immediate |
+| AuthService Dependencies | Critical | High | Low | Immediate |
+| Image Validation | High | Medium | Low | 1 Week |
+| Repository Coupling | High | Medium | Medium | 2 Weeks |
+| Error Logging | Medium | Low | Low | 1 Week |
+| Security Enhancements | High | High | High | 1 Month |
+
+## NEXT STEPS
+
+1. **Immediate (This Week)**:
+   - Fix password hashing inconsistency
+   - Add proper AuthService mocking
+   - Implement proper logging
+
+2. **Short Term (1-2 Weeks)**:
+   - Optimize image validation
+   - Refactor service dependencies
+   - Add missing repository methods
+
+3. **Medium Term (1 Month)**:
+   - Implement security enhancements
+   - Add comprehensive validation
+   - Performance optimizations
+
+4. **Long Term (2-3 Months)**:
+   - Full security audit
+   - Load testing implementation
+   - Monitoring and alerting setup

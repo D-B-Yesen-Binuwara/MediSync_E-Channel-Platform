@@ -1,0 +1,29 @@
+.payment-overlay {
+  position: absolute;
+  inset: 0;
+  background: transparent; /* no opaque overlay, underlying modal will be blurred */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+  padding: 1rem;
+}
+.payment-box {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1.25rem 1.25rem; /* add horizontal padding and a bit more vertical space */
+  width: 100%;
+  max-width: 460px; /* slightly wider */
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  box-sizing: border-box;
+}
+.payment-box h4 { margin: 0 0 0.5rem 0; font-size: 1.05rem; }
+.payment-box .form-group { margin-bottom: 0.75rem; }
+.payment-box .form-input { width: 100%; padding: 0.6rem 0.75rem; border-radius: 8px; border: 1px solid #d1d5db; box-sizing: border-box; }
+.form-error { color: #dc2626; font-size: 0.85rem; margin-top: 6px; }
+.form-error + .form-group { margin-top: 6px; }
+.payment-summary { border-bottom: none; margin-top: 8px; display:flex; justify-content:space-between; padding:0.25rem 0; }
+.payment-summary .label { color: #6b7280; }
+.payment-summary .value { font-weight:600; }
+.payment-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:12px; }

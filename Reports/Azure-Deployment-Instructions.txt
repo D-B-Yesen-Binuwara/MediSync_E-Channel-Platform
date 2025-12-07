@@ -1,0 +1,126 @@
+Azure Deployment Instructions for MediSync E-Channel Platform
+============================================================
+
+This guide explains how to:
+- Create an Azure SQL Database (free tier)
+- Deploy your ASP.NET backend to Azure App Service
+- Connect your backend to the Azure SQL Database
+- Use Azure DevOps for CI/CD (optional, basic setup)
+
+Prerequisites:
+--------------
+- Azure free account: https://azure.microsoft.com/free/
+- Visual Studio or VS Code
+- Azure CLI: https://docs.microsoft.com/cli/azure/install-azure-cli
+- GitHub account (for DevOps CI/CD)
+
+Step 1: Create Azure SQL Database
+---------------------------------
+1. Log in to the Azure Portal (https://portal.azure.com).
+2. Click "Create a resource" > "Databases" > "SQL Database".
+3. Fill in:
+   - Subscription: Free Trial
+   - Resource group: Create new (e.g., MediSyncRG)
+   - Database name: mediSyncDb
+   - Server: Create new (e.g., mediSyncServer)
+     - Set admin login and password (save these!)
+     - Choose region close to you
+   - Want to use SQL elastic pool: No
+   - Compute + storage: Select "Basic" or "Free" tier if available
+   - Click "Review + create" > "Create"
+4. Wait for deployment to finish.
+
+Step 2: Configure Database Firewall
+-----------------------------------
+1. In the Azure Portal, go to your SQL server (not the database).
+2. Click "Networking" or "Firewalls and virtual networks".
+3. Add your local IP to "Allow Azure services and resources to access this server" and "Add client IP".
+4. Save changes.
+
+Step 3: Get Connection String
+-----------------------------
+1. In the Azure Portal, go to your SQL database > "Connection strings".
+2. Copy the ADO.NET connection string.
+   - Example:
+     Server=tcp:mediSyncServer.database.windows.net,1433;Initial Catalog=mediSyncDb;Persist Security Info=False;User ID=YOUR_ADMIN;Password=YOUR_PASSWORD;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;
+
+Step 4: Update Backend Connection String
+----------------------------------------
+1. In your project, open `Backend/appsettings.json` and `appsettings.Development.json`.
+2. Replace the `DefaultConnection` value with your Azure SQL connection string.
+   - Example:
+     "ConnectionStrings": {
+       "DefaultConnection": "<PASTE_AZURE_CONNECTION_STRING_HERE>"
+     }
+3. (Optional) Use environment variables for production secrets.
+
+Step 5: Publish Backend to Azure App Service
+--------------------------------------------
+1. In Azure Portal, click "Create a resource" > "Web App".
+2. Fill in:
+   - Subscription: Free Trial
+   - Resource group: Use the same as before (MediSyncRG)
+   - Name: mediSync-backend
+   - Publish: Code
+   - Runtime stack: .NET 8 (or your version)
+   - Region: Same as database
+   - Click "Review + create" > "Create"
+3. Wait for deployment to finish.
+
+Step 6: Deploy Code to Azure App Service
+----------------------------------------
+Option 1: Deploy from VS Code/Visual Studio
+- In VS Code, install "Azure App Service" extension.
+- Sign in to Azure.
+- Right-click your project folder > "Deploy to Web App" > Select mediSync-backend.
+- Wait for deployment to complete.
+
+Option 2: Deploy using GitHub Actions (CI/CD)
+- In Azure Portal, go to your Web App > "Deployment Center".
+- Choose GitHub as source, select your repo and branch.
+- Azure will auto-generate a GitHub Actions workflow for .NET.
+- Push code to GitHub to trigger deployment.
+
+Step 7: Configure App Service Connection String
+-----------------------------------------------
+1. In Azure Portal, go to your Web App > "Configuration" > "Application settings".
+2. Add a new connection string:
+   - Name: DefaultConnection
+   - Value: (Paste your Azure SQL connection string)
+   - Type: SQLAzure
+3. Save and restart the Web App.
+
+Step 8: Run Entity Framework Migrations (if needed)
+---------------------------------------------------
+1. In VS Code terminal, run:
+   dotnet ef database update --connection "<PASTE_AZURE_CONNECTION_STRING_HERE>"
+2. Or, set up automatic migrations in your code.
+
+Step 9: Test Your Application
+-----------------------------
+- Visit your Web App URL (e.g., https://mediSync-backend.azurewebsites.net)
+- Verify backend connects to Azure SQL and works as expected.
+
+Step 10: (Optional) Set Up Azure DevOps Pipeline
+------------------------------------------------
+1. Go to https://dev.azure.com/ and create a new project.
+2. Connect your GitHub repo.
+3. Create a new Pipeline (YAML):
+   - Use the .NET template.
+   - Add steps to build, test, and deploy to Azure App Service.
+   - Save and run the pipeline.
+
+Tips:
+-----
+- Use Azure Portal for resource management.
+- Use Azure CLI for automation (az webapp, az sql, etc.).
+- Monitor usage to stay within free limits.
+- Secure your connection strings and secrets.
+
+For more details, see:
+- https://learn.microsoft.com/azure/app-service/quickstart-dotnetcore
+- https://learn.microsoft.com/azure/azure-sql/database/single-database-get-started
+- https://learn.microsoft.com/azure/devops/pipelines/get-started-yaml
+
+---
+This guide covers the basics for deploying your ASP.NET backend and database to Azure using a free account, with DevOps CI/CD options.

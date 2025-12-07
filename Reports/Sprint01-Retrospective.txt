@@ -1,0 +1,30 @@
+Sprint 01 Retrospective
+======================
+
+Summary:
+--------
+Sprint 01 focused on core patient account management and doctor search features. The team delivered registration, login, password reset, profile management, and basic doctor search/filtering. Most acceptance criteria were met, with some remaining work on doctor availability filtering.
+
+What Went Well:
+---------------
+- Registration, login, and password reset flows were implemented and tested.
+- Profile management allows patients to update key details.
+- Doctor search by specialization and name is functional.
+- Most acceptance criteria for account and search features were achieved.
+- Team collaborated well and delivered on planned stories.
+
+What Could Be Improved:
+-----------------------
+- Doctor availability filtering (date/slots) is not fully complete (E02.S02.A02.01).
+- Some edge cases in validation and error handling need more coverage.
+- More automated tests for UI and backend integration would increase confidence.
+- User feedback on profile and search UX could be gathered earlier.
+
+Action Items for Next Sprint:
+----------------------------
+- Complete doctor availability filtering and booking slot logic.
+- Add more automated tests (unit, integration, UI).
+- Review and improve error handling and validation.
+- Gather user feedback on new features and iterate on UX.
+
+Overall, Sprint 01 delivered the foundation for patient management and doctor search. The team should focus next on completing booking features and improving quality/coverage.

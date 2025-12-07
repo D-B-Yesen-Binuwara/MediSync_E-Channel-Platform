@@ -1,0 +1,37 @@
+/* Header styles */
+.dashboard-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 1rem 2rem;
+	background: #a5d0f8;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    margin-top: 0px;
+}
+
+.header-title {
+	font-size: 1.8rem;
+	font-weight: 800;
+	color: #191b1f;
+
+}
+
+.header-actions {
+	display: flex;
+	gap: 1rem;
+}
+
+.settings-button, .logout-button {
+	padding: 0.5rem 1.2rem;
+	border: none;
+	border-radius: 6px;
+	font-size: 1rem;
+	cursor: pointer;
+	background: #f3f4f6;
+	color: #2563eb;
+	transition: background 0.2s;
+}
+
+.settings-button:hover, .logout-button:hover {
+	background: #e0e7ff;
+}

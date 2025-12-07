@@ -1,3 +1,22 @@
+# Environment and secrets
+.env
+# appsettings.Development.json
+# appsettings.Local.json
+
+# Build output
+bin/
+obj/
+# IDE files
+*.user
+*.suo
+.vs/
+
+# Node/React
+node_modules/
+dist/
+# Logs
+*.log
+
 # Node / React
 node_modules/
 build/
