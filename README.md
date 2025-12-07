@@ -34,7 +34,7 @@ A web application that allows patients to register, search and filter doctors, b
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/hospital-echanneling.git
+   git clone https://github.com/D-B-Yesen-Binuwara/MediSync_E-Channel-Platform.git
 
 ## Team Members
 D B Y Binuwara
