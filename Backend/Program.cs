@@ -16,20 +16,9 @@ DotNetEnv.Env.Load(Path.Combine(Directory.GetCurrentDirectory(), ".env"));
 var builder = WebApplication.CreateBuilder(args);
 
 // Load DB connection string
-var rawConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-if (string.IsNullOrEmpty(rawConnectionString))
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrEmpty(connectionString))
     throw new InvalidOperationException("Database connection string 'DefaultConnection' is missing.");
-
-var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
-if (string.IsNullOrWhiteSpace(dbPassword))
-{
-    Console.WriteLine("ERROR: DB_PASSWORD not loaded from .env!");
-    throw new InvalidOperationException("DB_PASSWORD not loaded from .env");
-}
-
-var connectionString = rawConnectionString.Replace("${DB_PASSWORD}", dbPassword);
-Console.WriteLine($"DB_PASSWORD: {dbPassword}");
-Console.WriteLine($"ConnectionString: {connectionString}");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
@@ -122,7 +111,7 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     try
     {
-        db.Database.Migrate();
+        db.Database.EnsureCreated();
         
         // Seed data if empty
         if (!db.Doctors.Any())
