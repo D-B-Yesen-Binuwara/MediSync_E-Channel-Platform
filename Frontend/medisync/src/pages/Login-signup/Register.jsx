@@ -171,6 +171,8 @@ export default function Register() {
           cursor: pointer;
           transition: all 0.2s ease;
           text-align: center;
+          align-self: center;
+          width: 60%;
         }
         .btn.primary {
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

@@ -188,6 +188,8 @@ export default function Login({ onAuthed }) {
           cursor: pointer;
           transition: all 0.2s ease;
           text-align: center;
+          align-self: center;
+          width: 60%;
         }
 
         .btn.primary {
